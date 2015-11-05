@@ -12,22 +12,24 @@ function HttpAccessory(log, config) {
 	this.log = log;
 
 	// url info
-	this.on_url = config["on_url"];
-	this.on_body = config["on_body"];
-	this.off_url = config["off_url"];
-	this.off_body = config["off_body"];
+	this.on_url    = config["on_url"];
+	this.on_body   = config["on_body"];
+	this.off_url   = config["off_url"];
+	this.off_body  = config["off_body"];
 	this.brightness_url = config["brightness_url"];
 	this.http_method = config["http_method"];
 	this.username = config["username"];
 	this.password = config["password"];
+	this.sendimmediately = config["sendimmediately"];
 	this.service = config["service"] || "Switch";
 	this.name = config["name"];
 	this.brightnessHandling = config["brightnessHandling"] || "no";
+	this.log(this);
 }
 
 HttpAccessory.prototype = {
 
-	httpRequest: function(url, body, method, username, password, callback) {
+	httpRequest: function(url, body, method, username, password, sendimmediately, callback) {
 		request({
 				url: url,
 				body: body,
@@ -35,7 +37,7 @@ HttpAccessory.prototype = {
 				auth: {
 					user: username,
 					pass: password,
-					sendImmediately: false
+					sendImmediately: sendimmediately
 				}
 			},
 			function(error, response, body) {
@@ -57,7 +59,7 @@ HttpAccessory.prototype = {
 			this.log("Setting power state to off");
 		}
 
-		this.httpRequest(url, body, this.http_method, this.username, this.password, function(error, response, responseBody) {
+		this.httpRequest(url, body, this.http_method, this.username, this.password, this.sendimmediately, function(error, response, responseBody) {
 			if (error) {
 				this.log('HTTP power function failed: %s', error.message);
 				callback(error);
@@ -67,6 +69,7 @@ HttpAccessory.prototype = {
 				this.log(responseBody);
 				this.log(this.username);
 				this.log(this.password);
+				this.log(this.sendimmediately);
 				callback();
 			}
 		}.bind(this));
@@ -77,7 +80,7 @@ HttpAccessory.prototype = {
 
 		this.log("Setting brightness to %s", level);
 
-		this.httpRequest(url, "", this.http_method, this.username, this.password, function(error, response, body) {
+		this.httpRequest(url, "", this.http_method, this.username, this.password, this.sendimmediately, function(error, response, body) {
 			if (error) {
 				this.log('HTTP brightness function failed: %s', error);
 				callback(error);
