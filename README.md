@@ -15,22 +15,18 @@ Configuration sample:
  ```
 "accessories": [
         {
-            "accessory": "WeMo",
-            "name": "Lounge Lamp",
-            "description": "The Lamp in the Loungeroom",
-            "wemo_name": "Lounge Lamp"
-        },
-        {
-            "accessory": "WeMo",
-            "name": "Outside Lights",
-            "description": "The Festoon Lights in the Back Yard.",
-            "wemo_name": "Festoon Lights"
-        },
-        {
-            "accessory": "WeMo",
-            "name": "Bookcase Lamp",
-            "description": "The Festoon Lights in the Back Yard.",
-            "wemo_name": "Bookcase Lamp"
+            "accessory": "Http",
+            "name": "Kitchen Lamp",
+            "on_url": "https://192.168.1.22:3030/devices/23222/on",
+            "on_body": "{\"state\":\"On\"}",
+            "off_url": "https://192.168.1.22:3030/devices/23222/off",
+            "off_body": "{\"state\":\"Off\"}",
+            "brightness_url": "https://192.168.1.22:3030/devices/23222/brightness/%b",
+			"username": "",
+			"password": "",
+            "http_method": "POST",
+			"service": "Switch",
+			"brightnessHandling": "no"
         }
     ]
 
