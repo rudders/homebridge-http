@@ -24,6 +24,7 @@ Configuration sample:
             "brightness_url": "https://192.168.1.22:3030/devices/23222/brightness/%b",
 			"username": "",
 			"password": "",
+			"sendimmediately": "",
             "http_method": "POST",
 			"service": "Switch",
 			"brightnessHandling": "no"
