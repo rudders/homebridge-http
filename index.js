@@ -24,7 +24,6 @@ function HttpAccessory(log, config) {
 	this.service = config["service"] || "Switch";
 	this.name = config["name"];
 	this.brightnessHandling = config["brightnessHandling"] || "no";
-	this.log(this);
 }
 
 HttpAccessory.prototype = {
@@ -67,9 +66,7 @@ HttpAccessory.prototype = {
 				this.log('HTTP power function succeeded!');
 				this.log(response);
 				this.log(responseBody);
-				this.log(this.username);
-				this.log(this.password);
-				this.log(this.sendimmediately);
+	
 				callback();
 			}
 		}.bind(this));
