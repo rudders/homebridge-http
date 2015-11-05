@@ -1,0 +1,29 @@
+{
+    "bridge": {
+        "name": "HomebridgePI",
+        "username": "CD:22:3D:E3:CE:30",
+        "port": 51826,
+        "pin": "031-45-156"
+    },
+    
+    "description": "The Onion!",
+
+    "platforms": [],
+
+    "accessories": [
+        {
+            "accessory": "Http",
+            "name": "Kitchen Lamp",
+            "on_url": "https://192.168.1.22:3030/devices/23222/on",
+            "on_body": "{\"state\":\"On\"}",
+            "off_url": "https://192.168.1.22:3030/devices/23222/off",
+            "off_body": "{\"state\":\"Off\"}",
+            "brightness_url": "https://192.168.1.22:3030/devices/23222/brightness/%b",
+			"username": "",
+			"password": "",
+            "http_method": "POST",
+			"service": "Switch",
+			"brightnessHandling": "no"
+        }
+    ]
+}
