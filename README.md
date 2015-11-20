@@ -10,6 +10,8 @@ Supports https devices on HomeBridge Platform
 
 # Configuration
 
+if your http method for brightness is different to switching then add "http_brightness_method" to your config to set this - it will default to http_method if not present.
+
 Configuration sample:
 
  ```
@@ -26,6 +28,7 @@ Configuration sample:
 			"password": "",
 			"sendimmediately": "",
             "http_method": "POST",
+            "http_brightness_method": "POST",       
 			"service": "Switch",
 			"brightnessHandling": "no"
         }

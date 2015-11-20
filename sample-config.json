@@ -23,6 +23,7 @@
 			"password": "",
 			"sendimmediately": "",
             "http_method": "POST",
+            "http_brightness_method": "POST",
 			"service": "Switch",
 			"brightnessHandling": "no"
         }

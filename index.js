@@ -18,6 +18,7 @@ function HttpAccessory(log, config) {
 	this.off_body  = config["off_body"];
 	this.brightness_url = config["brightness_url"];
 	this.http_method = config["http_method"];
+	this.http_brightness_method = config["http_brightness_method"] || this.http_method;
 	this.username = config["username"];
 	this.password = config["password"];
 	this.sendimmediately = config["sendimmediately"];
@@ -77,7 +78,7 @@ HttpAccessory.prototype = {
 
 		this.log("Setting brightness to %s", level);
 
-		this.httpRequest(url, "", this.http_method, this.username, this.password, this.sendimmediately, function(error, response, body) {
+		this.httpRequest(url, "", this.http_brightness_method, this.username, this.password, this.sendimmediately, function(error, response, body) {
 			if (error) {
 				this.log('HTTP brightness function failed: %s', error);
 				callback(error);
