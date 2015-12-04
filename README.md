@@ -1,11 +1,11 @@
-# homebridge-http
+# homebridge-readablehttp
 
-Supports https devices on HomeBridge Platform
+Supports https devices on HomeBridge Platform and provides a readable callback
 
 # Installation
 
 1. Install homebridge using: npm install -g homebridge
-2. Install this plugin using: npm install -g homebridge-http
+2. Install this plugin using: npm install -g homebridge-readablehttp
 3. Update your configuration file. See sample-config.json in this repository for a sample. 
 
 # Configuration
@@ -23,6 +23,7 @@ Configuration sample:
             "on_body": "{\"state\":\"On\"}",
             "off_url": "https://192.168.1.22:3030/devices/23222/off",
             "off_body": "{\"state\":\"Off\"}",
+			"readable_url": "https://192.168.1.22:3030/devices/23222/status",
             "brightness_url": "https://192.168.1.22:3030/devices/23222/brightness/%b",
 			"username": "",
 			"password": "",

@@ -1,7 +1,7 @@
 {
-  "name": "homebridge-http",
+  "name": "homebridge-readablehttp",
   "version": "0.0.3",
-  "description": "https plugin for homebridge: https://github.com/nfarina/homebridge",
+  "description": "https plugin for homebridge: https://github.com/nfarina/homebridge, with readable state",
   "license": "ISC",
   "keywords": [
     "homebridge-plugin"
@@ -15,7 +15,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/rudders/homebridge-http.git"
+    "url": "git://github.com/mattharris5/homebridge-http.git"
   },
   "dependencies": {
     "request": "^2.65.0"

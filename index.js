@@ -4,7 +4,7 @@ var request = require("request");
 module.exports = function(homebridge){
   Service = homebridge.hap.Service;
   Characteristic = homebridge.hap.Characteristic;
-  homebridge.registerAccessory("homebridge-http", "Http", HttpAccessory);
+  homebridge.registerAccessory("homebridge-readablehttp", "Http", HttpAccessory);
 }
 
 
@@ -16,6 +16,7 @@ function HttpAccessory(log, config) {
 	this.on_body   = config["on_body"];
 	this.off_url   = config["off_url"];
 	this.off_body  = config["off_body"];
+  this.read_url  = config["read_url"];
 	this.brightness_url = config["brightness_url"];
 	this.http_method = config["http_method"];
 	this.http_brightness_method = config["http_brightness_method"] || this.http_method;
@@ -69,6 +70,26 @@ HttpAccessory.prototype = {
 				this.log(responseBody);
 	
 				callback();
+			}
+		}.bind(this));
+	},
+  
+	getPowerState: function(callback) {
+    if (!this.read_url) { callback(null); }
+    
+		var url = this.read_url;
+		this.log("Getting power state");
+
+		this.httpRequest(url, body, 'GET', function(error, response, responseBody) {
+			if (error) {
+				this.log('HTTP power function failed: %s', error.message);
+				callback(error);
+			} else {
+				this.log('HTTP get power status function succeeded!');
+				this.log(response);
+				this.log(responseBody);
+	
+				callback(body);
 			}
 		}.bind(this));
 	},
