@@ -80,7 +80,7 @@ HttpAccessory.prototype = {
     var url = this.read_url;
     this.log("Getting power state");
 
-    this.httpRequest(url, '', 'GET', function(error, response, responseBody) {
+    this.httpRequest(url, '', 'GET', this.username, this.password, this.sendimmediately, function(error, response, responseBody) {
       if (error) {
         this.log('HTTP get power function failed: %s', error.message);
         callback(error);
