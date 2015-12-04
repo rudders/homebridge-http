@@ -85,11 +85,10 @@ HttpAccessory.prototype = {
         this.log('HTTP get power function failed: %s', error.message);
         callback(error);
       } else {
-        this.log('HTTP get power status function succeeded!');
-        this.log(response);
-        this.log(responseBody);
-	
-        callback(responseBody);
+        var binaryState = parseInt(responseBody);
+        var powerOn = binaryState > 0;
+        this.log("Power state is currently %s", binaryState);
+        callback(null, powerOn);
       }
     }.bind(this));
   },
