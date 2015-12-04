@@ -15,7 +15,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/mattharris5/homebridge-http.git"
+    "url": "git://github.com/mattharris5/homebridge-readablehttp.git"
   },
   "dependencies": {
     "request": "^2.65.0"
