@@ -66,9 +66,8 @@ HttpAccessory.prototype = {
         callback(error);
       } else {
         this.log('HTTP set power function succeeded!');
-        this.log(response);
-        this.log(responseBody);
-	
+        // this.log(response);
+        // this.log(responseBody);
         callback();
       }
     }.bind(this));
