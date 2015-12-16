@@ -1,2 +1,9 @@
 
 *.log
+
+.settings/*
+.gitignore
+.project
+.npmignore
+.jshintrc
+
