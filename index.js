@@ -34,6 +34,7 @@ HttpAccessory.prototype = {
 				url: url,
 				body: body,
 				method: method,
+				rejectUnauthorized: false,
 				auth: {
 					user: username,
 					pass: password,
