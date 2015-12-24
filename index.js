@@ -4,11 +4,11 @@ var request = require("request");
 module.exports = function(homebridge){
   Service = homebridge.hap.Service;
   Characteristic = homebridge.hap.Characteristic;
-  homebridge.registerAccessory("homebridge-readablehttp", "Http", HttpAccessory);
+  homebridge.registerAccessory("homebridge-httpstatus", "HttpStatus", HttpStatusAccessory);
 }
 
 
-function HttpAccessory(log, config) {
+function HttpStatusAccessory(log, config) {
   this.log = log;
 
   // url info
@@ -16,8 +16,9 @@ function HttpAccessory(log, config) {
   this.on_body                = config["on_body"];
   this.off_url                = config["off_url"];
   this.off_body               = config["off_body"];
-  this.read_url               = config["read_url"];
+  this.status_url             = config["status_url"];
   this.brightness_url         = config["brightness_url"];
+  this.brightnesslvl_url			= config["brightnesslvl_url"];
   this.http_method            = config["http_method"];
   this.http_brightness_method = config["http_brightness_method"] || this.http_method;
   this.username               = config["username"];
@@ -28,7 +29,7 @@ function HttpAccessory(log, config) {
   this.brightnessHandling     = config["brightnessHandling"] || "no";
 }
 
-HttpAccessory.prototype = {
+HttpStatusAccessory.prototype = {
 
   httpRequest: function(url, body, method, username, password, sendimmediately, callback) {
     request({
@@ -74,12 +75,12 @@ HttpAccessory.prototype = {
   },
   
   getPowerState: function(callback) {
-    if (!this.read_url) { callback(null); }
+    if (!this.status_url) { callback(null); }
     
-    var url = this.read_url;
+    var url = this.status_url;
     this.log("Getting power state");
 
-    this.httpRequest(url, '', 'GET', this.username, this.password, this.sendimmediately, function(error, response, responseBody) {
+    this.httpRequest(url, "", "GET", this.username, this.password, this.sendimmediately, function(error, response, responseBody) {
       if (error) {
         this.log('HTTP get power function failed: %s', error.message);
         callback(error);
@@ -91,6 +92,25 @@ HttpAccessory.prototype = {
       }
     }.bind(this));
   },
+
+getBrightness: function(callback) {
+		if (!this.brightnesslvl_url) { callback(null); }
+		
+		var url = this.brightnesslvl_url;
+		this.log("Getting Brightness level");
+
+		this.httpRequest(url, "", "GET", this.username, this.password, this.sendimmediately, function(error, response, responseBody) {
+		  if (error) {
+			this.log('HTTP get brightness function failed: %s', error.message);
+			callback(error);
+		  } else {			
+		    var binaryState = parseInt(responseBody);
+			var level = binaryState;
+			this.log("brightness state is currently %s", binaryState);
+			callback(null, level);
+		  }
+		}.bind(this));
+	  },
 
   setBrightness: function(level, callback) {
     var url = this.brightness_url.replace("%b", level)
@@ -145,6 +165,7 @@ HttpAccessory.prototype = {
 
         lightbulbService
         .addCharacteristic(new Characteristic.Brightness())
+        .on('get', this.getBrightness.bind(this))
         .on('set', this.setBrightness.bind(this));
       }
 
