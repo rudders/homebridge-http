@@ -17,7 +17,7 @@ Configuration sample:
  ```
 "accessories": [
     {
-	"accessory": "Http",
+	"accessory": "HttpStatus",
 	"name": "Kitchen Lamp",
 	"on_url": "https://192.168.1.22:3030/devices/23222/on",
 	"on_body": "{\"state\":\"On\"}",
