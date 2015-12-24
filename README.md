@@ -1,6 +1,6 @@
-# homebridge-readablehttp
+# homebridge-httpstatus
 
-Supports https devices on the HomeBridge Platform and provides a readable callback for getting the "On" characteristic to Homekit.
+Supports https devices on the HomeBridge Platform and provides a readable callback for getting the "On" and brightness level characteristics to Homekit.
 
 # Installation
 
