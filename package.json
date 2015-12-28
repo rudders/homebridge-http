@@ -1,23 +1,55 @@
 {
-  "name": "homebridge-readablehttp",
-  "version": "0.0.3",
-  "description": "https plugin for homebridge: https://github.com/nfarina/homebridge, with readable state",
-  "license": "ISC",
-  "keywords": [
-    "homebridge-plugin"
+  "_args": [
+    [
+      ".",
+      ""
+    ]
   ],
-  "engines": {
-    "node": ">=0.12.0",
-    "homebridge": ">=0.2.0"
+  "_from": "lib/node_modules/homebridge-httpstatus",
+  "_id": "homebridge-httpstatus@0.0.3",
+  "_inCache": true,
+  "_installable": true,
+  "_location": "/homebridge-httpstatus",
+  "_phantomChildren": {},
+  "_requested": {
+    "name": null,
+    "raw": ".",
+    "rawSpec": ".",
+    "scope": null,
+    "spec": "/root/.nvm/versions/node/v0.12.7/lib/node_modules/homebridge-httpstatus",
+    "type": "directory"
   },
+  "_requiredBy": [
+    "#USER"
+  ],
+  "_resolved": "file:lib/node_modules/homebridge-httpstatus",
+  "_shasum": "818d9b3eac646c7d4ea7004b189da32349c0d574",
+  "_shrinkwrap": null,
+  "_spec": ".",
+  "_where": "",
   "author": {
-    "name": "Adrian Rudman"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/mattharris5/homebridge-readablehttp.git"
+    "name": "NovaG"
   },
   "dependencies": {
     "request": "^2.65.0"
-  }
+  },
+  "description": "http status plugin for homebridge: https://github.com/NovaGL/homebridge-httpstatus",
+  "devDependencies": {},
+  "engines": {
+    "homebridge": ">=0.2.0",
+    "node": ">=0.12.0"
+  },
+  "keywords": [
+    "homebridge-plugin"
+  ],
+  "license": "ISC",
+  "name": "homebridge-httpstatus",
+  "optionalDependencies": {},
+  "readme": "# homebridge-httpstatus\n\nSupports https devices on the HomeBridge Platform and provides a readable callback for getting the \"On\" and brightness level characteristics to Homekit.\n\n# Installation\n\n1. Install homebridge using: npm install -g homebridge\n2. Install this plugin by cloning this repo.\n3. Update your configuration file. See sample-config.json in this repository for a sample. \n\n# Configuration\n\nThe configuration for this plugin is the same as [homebridge-http](https://github.com/rudders/homebridge-http) but includes an additional method to read the power state of the device and the brightness level. Specify the `status_url` in your config.json that returns the status of the device as an integer (0 = off, 1 = on). Specify the `brightnesslvl_url` to return the current brighness level as an integer.\n\nConfiguration sample:\n\n ```\n\"accessories\": [\n    {\n\t\"accessory\": \"HttpStatus\",\n\t\"name\": \"Kitchen Lamp\",\n\t\"on_url\": \"https://192.168.1.22:3030/devices/23222/on\",\n\t\"on_body\": \"{\\\"state\\\":\\\"On\\\"}\",\n\t\"off_url\": \"https://192.168.1.22:3030/devices/23222/off\",\n\t\"off_body\": \"{\\\"state\\\":\\\"Off\\\"}\",\n\t\"status_url\": \"https://192.168.1.22:3030/devices/23222/status\",\n\t\"brightness_url\": \"https://192.168.1.22:3030/devices/23222/brightness/%b\",\n\t\"brightnesslvl\": \"https://192.168.1.22:3030/devices/23222/brightnesslvl\",\n\t\"username\": \"\",\n\t\"password\": \"\",\n\t\"sendimmediately\": \"\",\n\t\"http_method\": \"POST\",\n\t\"http_brightness_method\": \"POST\",       \n\t\"service\": \"Switch\",\n\t\"brightnessHandling\": \"no\"\n    }\n]\n\n```\n",
+  "readmeFilename": "README.md",
+  "repository": {
+    "type": "git",
+    "url": "git://https://github.com/NovaGL/homebridge-httpstatus.git"
+  },
+  "version": "0.0.3"
 }

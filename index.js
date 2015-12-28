@@ -18,15 +18,16 @@ function HttpStatusAccessory(log, config) {
   this.off_body               = config["off_body"];
   this.status_url             = config["status_url"];
   this.brightness_url         = config["brightness_url"];
-  this.brightnesslvl_url			= config["brightnesslvl_url"];
-  this.http_method            = config["http_method"];
+  this.brightnesslvl_url      = config["brightnesslvl_url"];
+  this.http_method            = config["http_method"] 	  	 || "GET";;
   this.http_brightness_method = config["http_brightness_method"] || this.http_method;
-  this.username               = config["username"];
-  this.password               = config["password"];
-  this.sendimmediately        = config["sendimmediately"];
-  this.service                = config["service"] || "Switch";
+  this.username               = config["username"] 	  	 || "";
+  this.password               = config["password"] 	  	 || "";
+  this.sendimmediately        = config["sendimmediately"] 	 || "";
+  this.service                = config["service"] 	  	 || "Switch";
   this.name                   = config["name"];
-  this.brightnessHandling     = config["brightnessHandling"] || "no";
+  this.brightnessHandling     = config["brightnessHandling"] 	 || "no";
+  this.switchHandling = config["switchHandling"] 		 || "no";
 }
 
 HttpStatusAccessory.prototype = {
@@ -51,6 +52,12 @@ HttpStatusAccessory.prototype = {
     var url;
     var body;
 
+    if (!this.on_url || !this.off_url) {
+    	    this.log.warn("Ignoring request; No power url defined.");
+	    callback(new Error("No power url defined."));
+	    return;
+    }
+
     if (powerOn) {
       url = this.on_url;
       body = this.on_body;
@@ -67,15 +74,17 @@ HttpStatusAccessory.prototype = {
         callback(error);
       } else {
         this.log('HTTP set power function succeeded!');
-        // this.log(response);
-        // this.log(responseBody);
         callback();
       }
     }.bind(this));
   },
   
   getPowerState: function(callback) {
-    if (!this.status_url) { callback(null); }
+    if (!this.status_url) {
+    	    this.log.warn("Ignoring request; No status url defined.");
+	    callback(new Error("No status url defined."));
+	    return;
+    }
     
     var url = this.status_url;
     this.log("Getting power state");
@@ -94,8 +103,11 @@ HttpStatusAccessory.prototype = {
   },
 
 getBrightness: function(callback) {
-		if (!this.brightnesslvl_url) { callback(null); }
-		
+	if (!this.brightnesslvl_url) {
+    	    this.log.warn("Ignoring request; No brightness level url defined.");
+	    callback(new Error("No brightness level url defined."));
+	    return;
+	 }		
 		var url = this.brightnesslvl_url;
 		this.log("Getting Brightness level");
 
@@ -113,6 +125,13 @@ getBrightness: function(callback) {
 	  },
 
   setBrightness: function(level, callback) {
+	
+	if (!this.brightness_url) {
+    	    this.log.warn("Ignoring request; No brightness url defined.");
+	    callback(new Error("No brightness url defined."));
+	    return;
+	 }    
+
     var url = this.brightness_url.replace("%b", level)
 
     this.log("Setting brightness to %s", level);
@@ -147,19 +166,30 @@ getBrightness: function(callback) {
     if (this.service == "Switch") {
       var switchService = new Service.Switch(this.name);
 
-      switchService
-      .getCharacteristic(Characteristic.On)
-      .on('get', this.getPowerState.bind(this))
-      .on('set', this.setPowerState.bind(this));
-
+      if (this.switchHandling == "yes") {
+			switchService
+			.getCharacteristic(Characteristic.On)
+			.on('get', this.getPowerState.bind(this))
+			.on('set', this.setPowerState.bind(this));
+		  } else {
+			switchService
+			.getCharacteristic(Characteristic.On)	
+			.on('set', this.setPowerState.bind(this));
+		  }
       return [switchService];
     } else if (this.service == "Light") {
       var lightbulbService = new Service.Lightbulb(this.name);
 
-      lightbulbService
-      .getCharacteristic(Characteristic.On)
-      .on('get', this.getPowerState.bind(this))
-      .on('set', this.setPowerState.bind(this));
+	if (this.switchHandling == "yes") {
+			lightbulbService
+			.getCharacteristic(Characteristic.On)
+			.on('get', this.getPowerState.bind(this))
+			.on('set', this.setPowerState.bind(this));
+		  } else {
+			lightbulbService
+			.getCharacteristic(Characteristic.On)	
+			.on('set', this.setPowerState.bind(this));
+		  }
 
       if (this.brightnessHandling == "yes") {
 
