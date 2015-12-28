@@ -15,25 +15,20 @@ The configuration for this plugin is the same as [homebridge-http](https://githu
 Configuration sample:
 
  ```
-"accessories": [
-    {
-	"accessory": "HttpStatus",
-	"name": "Kitchen Lamp",
-	"on_url": "https://192.168.1.22:3030/devices/23222/on",
-	"on_body": "{\"state\":\"On\"}",
-	"off_url": "https://192.168.1.22:3030/devices/23222/off",
-	"off_body": "{\"state\":\"Off\"}",
-	"status_url": "https://192.168.1.22:3030/devices/23222/status",
-	"brightness_url": "https://192.168.1.22:3030/devices/23222/brightness/%b",
-	"brightnesslvl": "https://192.168.1.22:3030/devices/23222/brightnesslvl",
-	"username": "",
-	"password": "",
-	"sendimmediately": "",
-	"http_method": "POST",
-	"http_brightness_method": "POST",       
-	"service": "Switch",
-	"brightnessHandling": "no"
-    }
-]
-
+"accessories": [ 
+	{
+		"accessory": "HttpStatus",
+		"name": "Alfresco Lamp",
+		"switchHandling": "yes",
+				"http_method": "GET",
+				"on_url":      "http://localhost/controller/1700/ON",
+				"off_url":     "http://localhost/controller/1700/OFF",
+				"status_url":  "http://localhost/status/100059",
+		"service": "Light",
+				"brightnessHandling": "yes",
+				"brightness_url":     "http://localhost/controller/1707/%b",
+				"brightnesslvl_url":  "http://localhost/status/100054"			
+									    
+       } 
+    ]
 ```
