@@ -4,7 +4,7 @@ var request = require("request");
 module.exports = function(homebridge){
   Service = homebridge.hap.Service;
   Characteristic = homebridge.hap.Characteristic;
-  homebridge.registerAccessory("homebridge-httpstatus", "HttpStatus", HttpStatusAccessory);
+  homebridge.registerAccessory("homebridge-httpstatus", "Http", HttpStatusAccessory);
 }
 
 

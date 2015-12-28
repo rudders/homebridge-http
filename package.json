@@ -1,6 +1,6 @@
 {
   "name": "homebridge-http",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "http(s) plugin for Homebridge: https://github.com/nfarina/homebridge",
   "license": "ISC",
   "keywords": [

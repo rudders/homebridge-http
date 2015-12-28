@@ -19,7 +19,7 @@ Configuration sample:
  ```
 "accessories": [ 
 	{
-		"accessory": "HttpStatus",
+		"accessory": "Http",
 		"name": "Alfresco Lamp",
 		"switchHandling": "yes",
 		"http_method": "GET",
