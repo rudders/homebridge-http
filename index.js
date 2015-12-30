@@ -4,7 +4,7 @@ var request = require("request");
 module.exports = function(homebridge){
   Service = homebridge.hap.Service;
   Characteristic = homebridge.hap.Characteristic;
-  homebridge.registerAccessory("homebridge-httpstatus", "HttpStatus", HttpStatusAccessory);
+  homebridge.registerAccessory("homebridge-httpstatus", "Http", HttpStatusAccessory);
 }
 
 
@@ -16,11 +16,16 @@ function HttpStatusAccessory(log, config) {
   this.on_body                = config["on_body"];
   this.off_url                = config["off_url"];
   this.off_body               = config["off_body"];
+  this.lock_url               = config["lock_url"]; 
+  this.lock_body              = config["lock_body"];
+  this.unlock_url             = config["unlock_url"]  		|| this.lock_url;
+  this.unlock_body            = config["unlock_body"] 		|| this.lock_body;
   this.status_url             = config["status_url"];
   this.brightness_url         = config["brightness_url"];
   this.brightnesslvl_url      = config["brightnesslvl_url"];
-  this.http_method            = config["http_method"] 	  	 || "GET";;
+  this.http_method            = config["http_method"] 	  	 || "GET";
   this.http_brightness_method = config["http_brightness_method"] || this.http_method;
+  this.http_lock_method       = config["http_lock_method"] 	 || this.http_method;
   this.username               = config["username"] 	  	 || "";
   this.password               = config["password"] 	  	 || "";
   this.sendimmediately        = config["sendimmediately"] 	 || "";
@@ -147,6 +152,51 @@ getBrightness: function(callback) {
     }.bind(this));
   },
 
+	getLockCurrentState: function(callback){
+		this.log("getLockCurrentState");
+		callback(null, 1); //Not possible with my setup
+	},
+	setLockCurrentState: function(callback){
+		this.log("setLockCurrentState");
+		callback(null, 1); //Not possible with my setup
+	},
+	getLockTargetState: function(callback){
+		this.log("getLockTargetState");
+		callback(null, 1); //Not possible with my setup
+	},
+	setLockTargetState: function(powerOn,callback) {
+		 var url;
+		var body;
+
+		    if (!this.unlock_url || !this.lock_url) {
+		    	    this.log.warn("Ignoring request; No Door url defined.");
+			    callback(new Error("No Door url defined."));
+		    	return;
+		    }
+
+	    if (powerOn) {
+	      url = this.lock_url;
+	      body = this.lock_body;
+	      this.log("Locking Door");
+	    } else {
+      		url = this.unlock_url;
+               body = this.unlock_body;
+      		this.log("Unlocking Door");
+	    }
+		this.httpRequest(url, body, this.http_method, this.username, this.password, this.sendimmediately, function(error, response, responseBody) {
+			if (error) {
+				this.log('HTTP Door function failed: %s', error.message);
+				callback(error);
+			} else {
+				this.log('HTTP Door function succeeded!');
+				this.log(response);
+				this.log(responseBody);
+	
+				callback();
+			}
+		}.bind(this));
+	},
+
   identify: function(callback) {
     this.log("Identify requested!");
     callback(); // success
@@ -200,6 +250,19 @@ getBrightness: function(callback) {
       }
 
       return [informationService, lightbulbService];
-    }
+    }  else if (this.service == "Lock") {
+      var lockService = new Service.LockMechanism(this.name);
+ 
+			lockService 
+			.getCharacteristic(Characteristic.LockCurrentState)
+			.on('get', this.getLockCurrentState.bind(this))
+			.on('set', this.setLockCurrentState.bind(this));
+
+			lockService 
+			.getCharacteristic(Characteristic.LockTargetState)
+			.on('get', this.getLockTargetState.bind(this))
+			.on('set', this.setLockTargetState.bind(this));
+
+      return [lockService]; }
   }
 };
