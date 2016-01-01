@@ -84,15 +84,16 @@ HttpStatusAccessory.prototype = {
     }.bind(this));
   },
   
-  getPowerState: function(callback) {
+  getStatusState: function(callback) {
     if (!this.status_url) {
     	    this.log.warn("Ignoring request; No status url defined.");
 	    callback(new Error("No status url defined."));
 	    return;
     }
     
+    var service = this.service;
     var url = this.status_url;
-    this.log("Getting power state");
+    this.log("Getting" , service , "state");
 
     this.httpRequest(url, "", "GET", this.username, this.password, this.sendimmediately, function(error, response, responseBody) {
       if (error) {
@@ -101,7 +102,7 @@ HttpStatusAccessory.prototype = {
       } else {
         var binaryState = parseInt(responseBody);
         var powerOn = binaryState > 0;
-        this.log("Power state is currently %s", binaryState);
+        this.log(service, "state is currently", binaryState);
         callback(null, powerOn);
       }
     }.bind(this));
@@ -129,7 +130,7 @@ getBrightness: function(callback) {
 		}.bind(this));
 	  },
 
-  setBrightness: function(level, callback) {
+	setBrightness: function(level, callback) {
 	
 	if (!this.brightness_url) {
     	    this.log.warn("Ignoring request; No brightness url defined.");
@@ -137,20 +138,20 @@ getBrightness: function(callback) {
 	    return;
 	 }    
 
-    var url = this.brightness_url.replace("%b", level)
+	var url = this.brightness_url.replace("%b", level)
 
-    this.log("Setting brightness to %s", level);
+	this.log("Setting brightness to %s", level);
 
-    this.httpRequest(url, "", this.http_brightness_method, this.username, this.password, this.sendimmediately, function(error, response, body) {
-      if (error) {
-        this.log('HTTP brightness function failed: %s', error);
-        callback(error);
-      } else {
-        this.log('HTTP brightness function succeeded!');
-        callback();
-      }
-    }.bind(this));
-  },
+	this.httpRequest(url, "", this.http_brightness_method, this.username, this.password, this.sendimmediately, function(error, response, body) {
+      	if (error) {
+        	this.log('HTTP brightness function failed: %s', error);
+        	callback(error);
+      	} else {
+        	this.log('HTTP brightness function succeeded!');
+        	callback();
+      	}
+    	}.bind(this));
+	},
 
 	getLockCurrentState: function(callback){
 		this.log("getLockCurrentState");
@@ -165,7 +166,7 @@ getBrightness: function(callback) {
 		callback(null, 1); //Not possible with my setup
 	},
 	setLockTargetState: function(powerOn,callback) {
-		 var url;
+		var url;
 		var body;
 
 		    if (!this.unlock_url || !this.lock_url) {
@@ -197,72 +198,94 @@ getBrightness: function(callback) {
 		}.bind(this));
 	},
 
-  identify: function(callback) {
-    this.log("Identify requested!");
-    callback(); // success
-  },
+	identify: function(callback) {
+    		this.log("Identify requested!");
+    		callback(); // success
+	},
 
-  getServices: function() {
+	getServices: function() {
 
-    // you can OPTIONALLY create an information service if you wish to override
-    // the default values for things like serial number, model, etc.
-    var informationService = new Service.AccessoryInformation();
+	 // you can OPTIONALLY create an information service if you wish to override
+    	// the default values for things like serial number, model, etc.
+    	var informationService = new Service.AccessoryInformation();
 
-    informationService
-    .setCharacteristic(Characteristic.Manufacturer, "HTTP Manufacturer")
-    .setCharacteristic(Characteristic.Model, "HTTP Model")
-    .setCharacteristic(Characteristic.SerialNumber, "HTTP Serial Number");
+    	informationService
+    	.setCharacteristic(Characteristic.Manufacturer, "HTTP Manufacturer")
+    	.setCharacteristic(Characteristic.Model, "HTTP Model")
+    	.setCharacteristic(Characteristic.SerialNumber, "HTTP Serial Number");
+switch (this.service) {
+	case "Switch":
+		var switchService = new Service.Switch(this.name);
 
-    if (this.service == "Switch") {
-      var switchService = new Service.Switch(this.name);
-
-      if (this.switchHandling == "yes") {
+		if (this.switchHandling == "yes") {
 			switchService
 			.getCharacteristic(Characteristic.On)
-			.on('get', this.getPowerState.bind(this))
+			.on('get', this.getStatusState.bind(this))
 			.on('set', this.setPowerState.bind(this));
-		  } else {
+		} else {
 			switchService
 			.getCharacteristic(Characteristic.On)	
 			.on('set', this.setPowerState.bind(this));
-		  }
-      return [switchService];
-    } else if (this.service == "Light") {
-      var lightbulbService = new Service.Lightbulb(this.name);
+		}
+	     	return [switchService];
+        	break;
+	case "Light":
+		var lightbulbService = new Service.Lightbulb(this.name);
 
-	if (this.switchHandling == "yes") {
+		if (this.switchHandling == "yes") {
 			lightbulbService
 			.getCharacteristic(Characteristic.On)
-			.on('get', this.getPowerState.bind(this))
+			.on('get', this.getStatusState.bind(this))
 			.on('set', this.setPowerState.bind(this));
-		  } else {
+		} else {
 			lightbulbService
 			.getCharacteristic(Characteristic.On)	
 			.on('set', this.setPowerState.bind(this));
-		  }
+		}
 
-      if (this.brightnessHandling == "yes") {
+		if (this.brightnessHandling == "yes") {
 
-        lightbulbService
-        .addCharacteristic(new Characteristic.Brightness())
-        .on('get', this.getBrightness.bind(this))
-        .on('set', this.setBrightness.bind(this));
-      }
+	        	lightbulbService
+        		.addCharacteristic(new Characteristic.Brightness())
+		        .on('get', this.getBrightness.bind(this))
+	        	.on('set', this.setBrightness.bind(this));
+      		}
 
-      return [informationService, lightbulbService];
-    }  else if (this.service == "Lock") {
-      var lockService = new Service.LockMechanism(this.name);
+        	return [informationService, lightbulbService];
+		break;
+	case "Door":
+		var lockService = new Service.LockMechanism(this.name);
  
-			lockService 
-			.getCharacteristic(Characteristic.LockCurrentState)
-			.on('get', this.getLockCurrentState.bind(this))
-			.on('set', this.setLockCurrentState.bind(this));
+		lockService 
+		.getCharacteristic(Characteristic.LockCurrentState)
+		.on('get', this.getLockCurrentState.bind(this))
+		.on('set', this.setLockCurrentState.bind(this));
 
-			lockService 
-			.getCharacteristic(Characteristic.LockTargetState)
-			.on('get', this.getLockTargetState.bind(this))
-			.on('set', this.setLockTargetState.bind(this));
+		lockService 
+		.getCharacteristic(Characteristic.LockTargetState)
+		.on('get', this.getLockTargetState.bind(this))
+		.on('set', this.setLockTargetState.bind(this));
 
-      return [lockService]; }
+	     	return [lockService];
+		break;
+	case "Smoke":
+	 	var smokeService = new Service.SmokeSensor(this.name);
+	
+		smokeService 
+		.getCharacteristic(Characteristic.SmokeDetected)
+		.on('set', this.getStatusState.bind(this));
+
+		return [smokeService];
+	    	break;
+	case "Motion":
+		var motionService = new Service.MotionSensor(this.name);
+	
+		motionService 
+		.getCharacteristic(Characteristic.MotionDetected)
+		.on('get', this.getStatusState.bind(this));
+
+		return [motionService];
+        	break;
+	}
   }
 };
