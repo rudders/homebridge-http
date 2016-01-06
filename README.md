@@ -1,6 +1,6 @@
-# homebridge-httpstatus
+# homebridge-http-advanced
 
-Supports https devices on the HomeBridge Platform and provides a readable callback for getting the "On" and brightness level characteristics to Homekit.
+Supports https devices on the HomeBridge Platform and provides a real time polling for getting the "On" and brightness level characteristics to Homekit. Includes Switch, Light, Door, Smoke and Motion sensor polling.
 
 # Installation
 
@@ -17,7 +17,7 @@ Configuration sample:
  ```
 "accessories": [ 
 	{
-		"accessory": "HttpStatus",
+		"accessory": "Http-advanced",
 		"name": "Alfresco Lamp",
 		"switchHandling": "yes",
 				"http_method": "GET",
