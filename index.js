@@ -36,54 +36,82 @@ function HttpAdvancedAccessory(log, config) {
 	this.switchHandling 	    = config["switchHandling"] 		 	|| "no";
 
 	this.state = false;
-
+	
+	this.currentlevel = 0;
     	var that = this;
 
-	var emitter = pollingtoevent(function(done) {
-        	that.httpRequest(that.status_url, "", "GET", that.username, that.password, that.sendimmediately, function(error, response, responseBody) {
+	// Status Polling
+	if (this.status_url) {
+		var url = this.status_url;
+		var statusemitter = pollingtoevent(function(done) {
+	        	that.httpRequest(url, "", "GET", that.username, that.password, that.sendimmediately, function(error, response, responseBody) {
             		if (error) {
                 		that.log('HTTP get power function failed: %s', error.message);
 		                callback(error);
             		} else {               				    
-		                done(null, responseBody);
+				done(null, responseBody);
             		}
-        	})
-    	}, {longpolling:true,interval:3000});
+        		})
+    	}, {longpolling:true,interval:300,longpollEventName:"statuspoll"});
 
-	emitter.on("longpoll", function(data) {       
-        	var binaryState = parseInt(data);
-	        that.state = binaryState > 0;
-		that.log(that.service, "received data from url:"+that.status_url, "state is currently", binaryState); 
+	statusemitter.on("statuspoll", function(data) {       
+        var binaryState = parseInt(data);
+	    that.state = binaryState > 0;
+		that.log(that.service, "received data:"+that.status_url, "state is currently", binaryState); 
 
-	switch (that.service) {
-		case "Switch":
-			if (that.switchService ) {
-				that.switchService .getCharacteristic(Characteristic.On)
-				.setValue(that.state);
-			}
+		switch (that.service) {
+			case "Switch":
+				if (that.switchService ) {
+					that.switchService .getCharacteristic(Characteristic.On)
+					.setValue(that.state);
+				}
+				break;
+			case "Light":
+				if (that.lightbulbService) {
+					that.lightbulbService.getCharacteristic(Characteristic.On)
+					.setValue(that.state);
+				}		
+				break;
+			case "Smoke":
+				if (that.smokeService) {
+					that.smokeService.getCharacteristic(Characteristic.SmokeDetected)
+					.setValue(that.state);
+				}
+				break;
+			case "Motion":
+				if (that.motionService) {
+					that.motionService.getCharacteristic(Characteristic.MotionDetected)
+					.setValue(that.state);
+				}		
 			break;
-		case "Light":
-			if (that.lightbulbService) {
-				that.lightbulbService.getCharacteristic(Characteristic.On)
-				.setValue(that.state);
-			}		
-			break;
-		case "Smoke":
-			if (that.smokeService) {
-				that.smokeService.getCharacteristic(Characteristic.SmokeDetected)
-				.setValue(that.state);
-			}
-			break;
-		case "Motion":
-			if (that.motionService) {
-				that.motionService.getCharacteristic(Characteristic.MotionDetected)
-				.setValue(that.state);
-			}		
-			break;
-		}        
+			}        
     });
 
+}
+	// Brightness Polling
+	if (this.brightnesslvl_url && this.brightnessHandling =="realtime") {
+		var url = this.brightnesslvl_url;
+		var levelemitter = pollingtoevent(function(done) {
+	        	that.httpRequest(url, "", "GET", that.username, that.password, that.sendimmediately, function(error, response, responseBody) {
+            		if (error) {
+                			that.log('HTTP get power function failed: %s', error.message);
+							return;
+            		} else {               				    
+						done(null, responseBody);
+            		}
+        		})
+    	}, {longpolling:true,interval:300,longpollEventName:"levelpoll"});
 
+		levelemitter.on("levelpoll", function(data) {  
+				that.currentlevel;
+
+			if (that.lightbulbService) {				
+				that.log(that.service, "received data:"+that.brightnesslvl_url, "level is currently", that.currentlevel); 		        
+				that.lightbulbService.getCharacteristic(Characteristic.Brightness)
+				.setValue(that.currentlevel);
+			}        
+    	});
+	}
 }
 
 HttpAdvancedAccessory.prototype = {
@@ -104,6 +132,29 @@ HttpAdvancedAccessory.prototype = {
 			callback(error, response, body)
 		})
 	},
+	getStatusState: function(callback) {
+		if (!this.status_url) {
+    			this.log.warn("Ignoring request; No status url defined.");
+	    		callback(new Error("No status url defined."));
+	    		return;
+   		 }
+    
+    	var service = this.service;
+		var url = this.status_url;
+    	this.log("Getting" , service , "state");
+
+    	this.httpRequest(url, "", "GET", this.username, this.password, this.sendimmediately, function(error, response, responseBody) {
+			if (error) {
+				this.log('HTTP get power function failed: %s', error.message);
+				callback(error);
+			} else {
+				var binaryState = parseInt(responseBody);
+				var powerOn = binaryState > 0;
+				this.log(service, "state is currently", binaryState);
+				callback(null, powerOn);
+			}
+	    }.bind(this));
+	  },
 
 	setPowerState: function(powerOn, callback) {
 		var url;
@@ -136,7 +187,6 @@ HttpAdvancedAccessory.prototype = {
 		}.bind(this));
 	},
   
-
 	getLockCurrentState: function(callback){
 		this.log("getLockCurrentState");
 		callback(null, 1); //Not possible with my setup
@@ -161,9 +211,9 @@ HttpAdvancedAccessory.prototype = {
 		}
 
 	    if (powerOn) {
-	      url = this.lock_url;
-	      body = this.lock_body;
-	      this.log("Locking Door");
+			url = this.lock_url;
+			body = this.lock_body;
+			this.log("Locking Door");
 	    } else {
       		url = this.unlock_url;
             body = this.unlock_body;
@@ -195,9 +245,8 @@ HttpAdvancedAccessory.prototype = {
 				this.log('HTTP get brightness function failed: %s', error.message);
 				callback(error);
 			} else {			
-				var binaryState = parseInt(responseBody);
-				var level = binaryState;
-				this.log("brightness state is currently %s", binaryState);
+				var level = parseInt(responseBody);				
+				this.log("brightness state is currently %s", level);
 				callback(null, level);
 			}
 		}.bind(this));
@@ -210,6 +259,11 @@ HttpAdvancedAccessory.prototype = {
 			callback(new Error("No brightness url defined."));
 			return;
 		}    
+		if (!this.on_url || !this.off_url) {
+			this.log.warn("Ignoring request; No power url defined.");
+			callback(new Error("No power url defined."));
+			return;
+		}
 		
 		var url = this.brightness_url.replace("%b", level)
 		
@@ -233,8 +287,7 @@ HttpAdvancedAccessory.prototype = {
 
   getServices: function() {
 	var that = this;	
-    // you can OPTIONALLY create an information service if you wish to override
-    // the default values for things like serial number, model, etc.
+    
     var informationService = new Service.AccessoryInformation();
 
     informationService
@@ -243,82 +296,99 @@ HttpAdvancedAccessory.prototype = {
     .setCharacteristic(Characteristic.SerialNumber, "HTTP Serial Number");
 
 	switch (this.service) {
-	case "Switch":
-		
-
-		if (this.switchHandling == "yes") {
-			this.switchService = new Service.Switch(this.name);			
-			this.switchService
-
-			.getCharacteristic(Characteristic.On)
-			.on('get', function(callback) {callback(null, that.state)})
-			.on('set', this.setPowerState.bind(this));
-			return [this.switchService];
+		case "Switch": 
+			this.switchService = new Service.Switch(this.name);
+			switch (this.switchHandling) {			
+				case "yes":					
+					this.switchService
+					.getCharacteristic(Characteristic.On)
+					.on('get', this.getStatusState.bind(this))
+					.on('set', this.setPowerState.bind(this));
+					return [this.switchService];	
+					break;
+				case "realtime":				
+					this.switchService
+					.getCharacteristic(Characteristic.On)
+					.on('get', function(callback) {callback(null, that.state)})
+					.on('set', this.setPowerState.bind(this));
+					return [this.switchService];
+					break;
+				default	:	
+					this.switchService
+					.getCharacteristic(Characteristic.On)	
+					.on('set', this.setPowerState.bind(this));
+					return [this.switchService];	
+					break;}
+		case "Light":	
+			this.lightbulbService = new Service.Lightbulb(this.name);			
+			switch (this.switchHandling) {
+	
+			case "yes" :
+				this.lightbulbService
+				.getCharacteristic(Characteristic.On)
+				.on('get', this.getStatusState.bind(this))
+				.on('set', this.setPowerState.bind(this));
+				break;
+			case "realtime":
+				this.lightbulbService
+				.getCharacteristic(Characteristic.On)
+				.on('get', function(callback) {callback(null, that.state)})
+				.on('set', this.setPowerState.bind(this));
+				break;
+			default:		
+				this.lightbulbService
+				.getCharacteristic(Characteristic.On)	
+				.on('set', this.setPowerState.bind(this));
+				break;
+			}
+			
+			if (this.brightnessHandling == "realtime") {
+				this.lightbulbService 
+				.addCharacteristic(new Characteristic.Brightness())
+				.on('get', function(callback) {callback(null, that.currentlevel)})
+				.on('set', this.setBrightness.bind(this));
+			} else if (this.brightnessHandling == "yes") {
+				this.lightbulbService
+				.addCharacteristic(new Characteristic.Brightness())
+				.on('get', this.getBrightness.bind(this))
+				.on('set', this.setBrightness.bind(this));							
+			}
+	
+			return [informationService, this.lightbulbService];
 			break;
-		} else {
-			var switchService = new Service.Switch(this.name);
-			switchService
-			.getCharacteristic(Characteristic.On)	
-			.on('set', this.setPowerState.bind(this));
-		     	return [switchService];
-		}
-        	break;
-	case "Light":
-		var lightbulbService = new Service.Lightbulb(this.name);
-
-		if (this.switchHandling == "yes") {
-			lightbulbService
-			.getCharacteristic(Characteristic.On)
-			.on('get', this.getStatusState.bind(this))
-			.on('set', this.setPowerState.bind(this));
-		} else {
-			lightbulbService
-			.getCharacteristic(Characteristic.On)	
-			.on('set', this.setPowerState.bind(this));
-		}
-
-		if (this.brightnessHandling == "yes") {
-
-	        	lightbulbService
-        		.addCharacteristic(new Characteristic.Brightness())
-		        .on('get', this.getBrightness.bind(this))
-	        	.on('set', this.setBrightness.bind(this));
-      		}
-
-        	return [informationService, lightbulbService];
-		break;
-	case "Door":
-		var lockService = new Service.LockMechanism(this.name);
- 
-		lockService 
-		.getCharacteristic(Characteristic.LockCurrentState)
-		.on('get', this.getLockCurrentState.bind(this))
-		.on('set', this.setLockCurrentState.bind(this));
-
-		lockService 
-		.getCharacteristic(Characteristic.LockTargetState)
-		.on('get', this.getLockTargetState.bind(this))
-		.on('set', this.setLockTargetState.bind(this));
-
-	     	return [lockService];
-		break;
-	case "Smoke":
-		this.smokeService = new Service.MotionSensor(this.name);
-	        
-		this.smokeService
-		.getCharacteristic(Characteristic.SmokeDetected)
-		.on('get', function(callback) {callback(null, that.state)});
-
-		return [this.smokeService];
-	case "Motion":
-		this.motionService = new Service.MotionSensor(this.name);
-	        
-		this.motionService
-		.getCharacteristic(Characteristic.MotionDetected)
-		.on('get', function(callback) {callback(null, that.state)});
-
-	        return [this.motionService];
-        	break;
+		case "Door":
+			var lockService = new Service.LockMechanism(this.name);
+		
+			lockService 
+			.getCharacteristic(Characteristic.LockCurrentState)
+			.on('get', this.getLockCurrentState.bind(this))
+			.on('set', this.setLockCurrentState.bind(this));
+		
+			lockService 
+			.getCharacteristic(Characteristic.LockTargetState)
+			.on('get', this.getLockTargetState.bind(this))
+			.on('set', this.setLockTargetState.bind(this));
+		
+			return [lockService];
+			break;
+		case "Smoke":
+			this.smokeService = new Service.MotionSensor(this.name);
+			this.switchHandling=="realtime";
+	
+			this.smokeService
+			.getCharacteristic(Characteristic.SmokeDetected)
+			.on('get', function(callback) {callback(null, that.state)});
+	
+			return [this.smokeService];
+		case "Motion":
+			this.motionService = new Service.MotionSensor(this.name);
+			this.switchHandling=="realtime";				
+			this.motionService
+			.getCharacteristic(Characteristic.MotionDetected)
+			.on('get', function(callback) {callback(null, that.state)});
+	
+			return [this.motionService];
+			break;
 	}
   }
 };
