@@ -41,7 +41,7 @@ function HttpAdvancedAccessory(log, config) {
     	var that = this;
 
 	// Status Polling
-	if (this.status_url) {
+	if ((this.status_url && this.switchHandling =="realtime") || (this.service=="Smoke" || this.service=="Motion")) {
 		var url = this.status_url;
 		var statusemitter = pollingtoevent(function(done) {
 	        	that.httpRequest(url, "", "GET", that.username, that.password, that.sendimmediately, function(error, response, responseBody) {
@@ -55,8 +55,8 @@ function HttpAdvancedAccessory(log, config) {
     	}, {longpolling:true,interval:300,longpollEventName:"statuspoll"});
 
 	statusemitter.on("statuspoll", function(data) {       
-        var binaryState = parseInt(data);
-	    that.state = binaryState > 0;
+        	var binaryState = parseInt(data);
+	    	that.state = binaryState > 0;
 		that.log(that.service, "received data:"+that.status_url, "state is currently", binaryState); 
 
 		switch (that.service) {
@@ -103,7 +103,7 @@ function HttpAdvancedAccessory(log, config) {
     	}, {longpolling:true,interval:300,longpollEventName:"levelpoll"});
 
 		levelemitter.on("levelpoll", function(data) {  
-				that.currentlevel;
+			that.currentlevelparseInt(data);
 
 			if (that.lightbulbService) {				
 				that.log(that.service, "received data:"+that.brightnesslvl_url, "level is currently", that.currentlevel); 		        
