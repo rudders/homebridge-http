@@ -100,10 +100,10 @@ function HttpAdvancedAccessory(log, config) {
 						done(null, responseBody);
             		}
         		})
-    	}, {longpolling:true,interval:300,longpollEventName:"levelpoll"});
+    	}, {longpolling:true,interval:3000,longpollEventName:"levelpoll"});
 
 		levelemitter.on("levelpoll", function(data) {  
-			that.currentlevelparseInt(data);
+			that.currentlevel=parseInt(data);
 
 			if (that.lightbulbService) {				
 				that.log(that.service, "received data:"+that.brightnesslvl_url, "level is currently", that.currentlevel); 		        
