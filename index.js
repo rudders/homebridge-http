@@ -42,14 +42,14 @@ function HttpAdvancedAccessory(log, config) {
 
 	// Status Polling
 	if ((this.status_url && this.switchHandling =="realtime") || (this.service=="Smoke" || this.service=="Motion")) {
-		var url = this.status_url;
+		var powerurl = this.status_url;
 		var statusemitter = pollingtoevent(function(done) {
-	        	that.httpRequest(url, "", "GET", that.username, that.password, that.sendimmediately, function(error, response, responseBody) {
+	        	that.httpRequest(powerurl , "", "GET", that.username, that.password, that.sendimmediately, function(error, response, body) {
             		if (error) {
                 		that.log('HTTP get power function failed: %s', error.message);
 		                callback(error);
             		} else {               				    
-				done(null, responseBody);
+				done(null, body);
             		}
         		})
     	}, {longpolling:true,interval:300,longpollEventName:"statuspoll"});
@@ -90,9 +90,9 @@ function HttpAdvancedAccessory(log, config) {
 }
 	// Brightness Polling
 	if (this.brightnesslvl_url && this.brightnessHandling =="realtime") {
-		var url = this.brightnesslvl_url;
+		var brightnessurl = this.brightnesslvl_url;
 		var levelemitter = pollingtoevent(function(done) {
-	        	that.httpRequest(url, "", "GET", that.username, that.password, that.sendimmediately, function(error, response, responseBody) {
+	        	that.httpRequest(brightnessurl, "", "GET", that.username, that.password, that.sendimmediately, function(error, response, responseBody) {
             		if (error) {
                 			that.log('HTTP get power function failed: %s', error.message);
 							return;
