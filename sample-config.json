@@ -11,12 +11,12 @@
     "accessories": [ {
 	        "accessory": "HttpStatus",
                 "name": "Alfresco Lamp",
-		"switchHandling": "yes",
+			"switchHandling": "realtime",
 				"http_method": "GET",
 				"on_url":      "http://localhost/controller/1700/ON",
 				"off_url":     "http://localhost/controller/1700/OFF",
-				"status_url":  "http://localhost/status/100059",
-		"service": "Light",
+				"status_url":  "http://localhost/status/100059",				
+			"service": "Light",
 				"brightnessHandling": "yes",
 				"brightness_url":     "http://localhost/controller/1707/%b",
 				"brightnesslvl_url":  "http://localhost/status/100054"			
