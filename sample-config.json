@@ -9,7 +9,7 @@
     "description": "HomeBridge HTTP Status Control",
 
     "accessories": [ {
-	        "accessory": "HttpStatus",
+	        "accessory": "Http",
                 "name": "Alfresco Lamp",
 			"switchHandling": "realtime",
 				"http_method": "GET",
