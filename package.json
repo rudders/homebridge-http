@@ -1,6 +1,6 @@
 {
   "name": "homebridge-http",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "http(s) plugin for Homebridge: https://github.com/nfarina/homebridge",
   "license": "ISC",
   "keywords": [
@@ -13,11 +13,16 @@
   "author": {
     "name": "Adrian Rudman"
   },
+  "contributors":[
+  { "name" : "NovaGL"},
+  { "name" : "David Parry"}
+  ], 
   "repository": {
     "type": "git",
     "url": "git://github.com/rudders/homebridge-http.git"
   },
   "dependencies": {
-    "request": "^2.65.0"
+    "request": "^2.65.0",
+	"polling-to-event": ">=2.0.2"
   }
 }

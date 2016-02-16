@@ -14,6 +14,8 @@ This module has recently been updated to support an additional method to read th
 
 Specify the `brightnesslvl_url` to return the current brightness level as an integer.
 
+Switch Handling and brightness Handling support 3 methods, yes for polling on app load, realtime for constant polling or no polling
+
 Configuration sample:
 
  ```
@@ -21,7 +23,7 @@ Configuration sample:
 	{
 		"accessory": "Http",
 		"name": "Alfresco Lamp",
-		"switchHandling": "yes",
+		"switchHandling": "realtime",
 		"http_method": "GET",
 		"on_url":      "http://localhost/controller/1700/ON",
 		"off_url":     "http://localhost/controller/1700/OFF",
