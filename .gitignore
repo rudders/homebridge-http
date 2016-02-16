@@ -8,3 +8,4 @@
 .jshintrc
 
 *.orig
+node_modules/*
