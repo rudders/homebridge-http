@@ -1,3 +1,9 @@
+#Seeking New Maintainers
+
+As I have commitments that don't allow me to progress this module I'm actively seeking contributors to this repo to maintain it. 
+
+Please let me know if you're interested.
+
 # homebridge-http
 
 Supports https devices on the HomeBridge Platform and provides a readable callback for getting the "On" and brightness level characteristics to Homekit.
