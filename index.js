@@ -33,6 +33,7 @@ var pollingtoevent = require('polling-to-event');
 		//realtime polling info
 		this.state = false;
 		this.currentlevel = 0;
+		this.enableSet = true;
 		var that = this;
 		
 		// Status Polling, if you want to add additional services that don't use switch handling you can add something like this || (this.service=="Smoke" || this.service=="Motion"))
@@ -50,10 +51,11 @@ var pollingtoevent = require('polling-to-event');
 			}, {longpolling:true,interval:300,longpollEventName:"statuspoll"});
 
 		statusemitter.on("statuspoll", function(data) {       
-        	var binaryState = parseInt(data);
+        	var binaryState = parseInt(data.replace(/\D/g,""));
 	    	that.state = binaryState > 0;
 			that.log(that.service, "received power",that.status_url, "state is currently", binaryState); 
 			// switch used to easily add additonal services
+			that.enableSet = false;
 			switch (that.service) {
 				case "Switch":
 					if (that.switchService ) {
@@ -67,7 +69,8 @@ var pollingtoevent = require('polling-to-event');
 						.setValue(that.state);
 					}		
 					break;			
-				}        
+			}
+			that.enableSet = true;   
 		});
 
 	}
@@ -83,16 +86,18 @@ var pollingtoevent = require('polling-to-event');
 						done(null, responseBody);
             		}
         		}) // set longer polling as slider takes longer to set value
-    	}, {longpolling:true,interval:2000,longpollEventName:"levelpoll"});
+    	}, {longpolling:true,interval:300,longpollEventName:"levelpoll"});
 
 		levelemitter.on("levelpoll", function(data) {  
 			that.currentlevel = parseInt(data);
 
+			that.enableSet = false;
 			if (that.lightbulbService) {				
 				that.log(that.service, "received brightness",that.brightnesslvl_url, "level is currently", that.currentlevel); 		        
 				that.lightbulbService.getCharacteristic(Characteristic.Brightness)
 				.setValue(that.currentlevel);
-			}        
+			}   
+			that.enableSet = true;
     	});
 	}
 	}
@@ -117,6 +122,9 @@ var pollingtoevent = require('polling-to-event');
 	},
 
 	setPowerState: function(powerOn, callback) {
+				
+	if (this.enableSet == true && (this.currentlevel == 0 || !powerOn )) {
+		
 		var url;
 		var body;
 		
@@ -145,6 +153,9 @@ var pollingtoevent = require('polling-to-event');
 			callback();
 			}
 		}.bind(this));
+	} else {
+	 	callback();
+	}
 	},
   
   getPowerState: function(callback) {
@@ -162,7 +173,7 @@ var pollingtoevent = require('polling-to-event');
 		this.log('HTTP get power function failed: %s', error.message);
 		callback(error);
 	} else {
-		var binaryState = parseInt(responseBody);
+		var binaryState = parseInt(responseBody.replace(/\D/g,""));
 		var powerOn = binaryState > 0;
 		this.log("Power state is currently %s", binaryState);
 		callback(null, powerOn);
@@ -184,7 +195,7 @@ var pollingtoevent = require('polling-to-event');
 				this.log('HTTP get brightness function failed: %s', error.message);
 				callback(error);
 			} else {			
-				var binaryState = parseInt(responseBody);
+				var binaryState = parseInt(responseBody.replace(/\D/g,""));
 				var level = binaryState;
 				this.log("brightness state is currently %s", binaryState);
 				callback(null, level);
@@ -193,7 +204,7 @@ var pollingtoevent = require('polling-to-event');
 	  },
 
 	setBrightness: function(level, callback) {
-		
+	if (this.enableSet == true) {
 		if (!this.brightness_url) {
 			this.log.warn("Ignoring request; No brightness url defined.");
 			callback(new Error("No brightness url defined."));
@@ -213,6 +224,9 @@ var pollingtoevent = require('polling-to-event');
 			callback();
 		}
 		}.bind(this));
+	} else {
+		callback();
+	}
 	},
 
 	identify: function(callback) {
