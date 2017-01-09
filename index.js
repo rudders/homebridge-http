@@ -173,7 +173,12 @@ var pollingtoevent = require('polling-to-event');
 		this.log('HTTP get power function failed: %s', error.message);
 		callback(error);
 	} else {
-		var binaryState = parseInt(responseBody.replace(/\D/g,""));
+               if (responseBody.includes("ACTIVE")) {
+                        var isMotionActive = responseBody.includes("ACTIVE");   // Added support for motion http response for ON
+                        var binaryState = Number(isMotionActive);
+                } else {
+                        var binaryState = parseInt(responseBody.replace(/\D/g,""));
+                }
 		var powerOn = binaryState > 0;
 		this.log("Power state is currently %s", binaryState);
 		callback(null, powerOn);
