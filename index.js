@@ -175,20 +175,18 @@ var pollingtoevent = require('polling-to-event');
 		this.log('HTTP get power function failed: %s', error.message);
 		callback(error);
 	} else {
-		var binaryState = parseInt(responseBody.replace(/\D/g,"")); 
-		if (isNaN(binaryState)) { 					//Check if we have a number response
-			var customStatusOn = this.status_on; 
-    			var customStatusOff = this.status_off;
-    			var statusActive = responseBody.includes(customStatusOn);
-    			binaryState = Number(statusActive);
-    			if (isNaN(binaryState)) {				//Check if we have a number now
-    				statusActive = responseBody.includes(customStatusOff);
-        			if (statusActive) binaryState = 0;
-    			}   
-		}
-		var powerOn = binaryState > 0;
-		this.log("Power state is currently %s", binaryState);
-		callback(null, powerOn);
+                var binaryState = parseInt(responseBody.replace(/\D/g,""));
+                if (isNaN(binaryState)) {                                       //Check if we have a number response
+                        var customStatusOn = this.status_on;
+                        var customStatusOff = this.status_off;
+                        var statusOn = responseBody.includes(customStatusOn);
+                        var statusOff = responseBody.includes(customStatusOff);        
+                        if (statusOn) binaryState = 1;
+                        if (statusOff) binaryState = 0;
+                }
+                var powerOn = binaryState > 0;
+                this.log("Power state is currently %s", binaryState);
+                callback(null, powerOn);
 	}
 	}.bind(this));
   },
