@@ -181,9 +181,9 @@ var pollingtoevent = require('polling-to-event');
     			var customStatusOff = this.status_off;
     			var statusActive = responseBody.includes(customStatusOn);
     			binaryState = Number(statusActive);
-    			if (isNaN(binaryState)) {				//Check if we have a nuber now
+    			if (isNaN(binaryState)) {				//Check if we have a number now
     				statusActive = responseBody.includes(customStatusOff);
-        			binaryState = Number(statusActive);
+        			if (statusActive) binaryState = 0;
     			}   
 		}
 		var powerOn = binaryState > 0;
