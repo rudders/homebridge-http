@@ -18,6 +18,8 @@ var pollingtoevent = require('polling-to-event');
 		this.off_url                = config["off_url"];
 		this.off_body               = config["off_body"];
 		this.status_url             = config["status_url"];
+		this.status_on 		    = config["status_on"];
+		this.status_off 	    = config["status_off"];
 		this.brightness_url         = config["brightness_url"];
 		this.brightnesslvl_url      = config["brightnesslvl_url"];
 		this.http_method            = config["http_method"] 	  	 	|| "GET";;
@@ -173,15 +175,20 @@ var pollingtoevent = require('polling-to-event');
 		this.log('HTTP get power function failed: %s', error.message);
 		callback(error);
 	} else {
-               if (responseBody.includes("ACTIVE")) {
-                        var isMotionActive = responseBody.includes("ACTIVE");   // Added support for motion http response for ON
-                        var binaryState = Number(isMotionActive);
-                } else {
-                        var binaryState = parseInt(responseBody.replace(/\D/g,""));
-                }
-		var powerOn = binaryState > 0;
-		this.log("Power state is currently %s", binaryState);
-		callback(null, powerOn);
+		var binaryState = parseInt(responseBody.replace(/\D/g,"")); 
+		if (isNaN(binaryState)) { 					//Check if we have a number response
+			var customStatusOn = this.status_on; 
+    			var customStatusOff = this.status_off;
+    			var statusActive = responseBody.includes(customStatusOn);
+    			binaryState = Number(statusActive);
+    			if (isNaN(binaryState)) {				//Check if we have a nuber now
+    				statusActive = responseBody.includes(customStatusOff);
+        			binaryState = Number(statusActive);
+    			}   
+		}
+	var powerOn = binaryState > 0;
+	this.log("Power state is currently %s", binaryState);
+	callback(null, powerOn);
 	}
 	}.bind(this));
   },
