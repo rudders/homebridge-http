@@ -186,9 +186,9 @@ var pollingtoevent = require('polling-to-event');
         			binaryState = Number(statusActive);
     			}   
 		}
-	var powerOn = binaryState > 0;
-	this.log("Power state is currently %s", binaryState);
-	callback(null, powerOn);
+		var powerOn = binaryState > 0;
+		this.log("Power state is currently %s", binaryState);
+		callback(null, powerOn);
 	}
 	}.bind(this));
   },
