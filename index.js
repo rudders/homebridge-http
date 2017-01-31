@@ -43,7 +43,7 @@ var pollingtoevent = require('polling-to-event');
 	        	that.httpRequest(powerurl, "", "GET", that.username, that.password, that.sendimmediately, function(error, response, body) {
             		if (error) {
                 		that.log('HTTP get power function failed: %s', error.message);
-		                callback(error);
+		                done(error);
             		} else {               				    
 						done(null, body);
             		}
