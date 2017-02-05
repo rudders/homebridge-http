@@ -1,26 +1,26 @@
 {
-     "bridge": {
-        "name": "HomeBridge",
-        "username": "CC:22:3D:E3:CE:30",
-        "port": 51826,
-        "pin": "031-45-154"
-    },
-    
-    "description": "HomeBridge HTTP Status Control",
+  "bridge": {
+    "name": "HomeBridge",
+    "username": "CC:22:3D:E3:CE:30",
+    "port": 51826,
+    "pin": "031-45-154"
+  },
 
-    "accessories": [ {
-	        "accessory": "Http",
-                "name": "Alfresco Lamp",
-			"switchHandling": "realtime",
-				"http_method": "GET",
-				"on_url":      "http://localhost/controller/1700/ON",
-				"off_url":     "http://localhost/controller/1700/OFF",
-				"status_url":  "http://localhost/status/100059",				
-			"service": "Light",
-				"brightnessHandling": "yes",
-				"brightness_url":     "http://localhost/controller/1707/%b",
-				"brightnesslvl_url":  "http://localhost/status/100054"			
-									    
-       } 
-    ]
+  "description": "HomeBridge HTTP Status Control",
+
+  "accessories": [
+    {
+      "accessory": "Http",
+      "name": "Alfresco Lamp",
+      "switchHandling": "realtime",
+      "http_method": "GET",
+      "on_url": "http://localhost/controller/1700/ON",
+      "off_url": "http://localhost/controller/1700/OFF",
+      "status_url": "http://localhost/status/100059",
+      "service": "Light",
+      "brightnessHandling": "yes",
+      "brightness_url": "http://localhost/controller/1707/%b",
+      "brightnesslvl_url": "http://localhost/status/100054"
+    }
+  ]
 }
