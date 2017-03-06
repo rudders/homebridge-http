@@ -21,14 +21,15 @@ var pollingtoevent = require('polling-to-event');
 		this.brightness_url         = config["brightness_url"];
 		this.brightnesslvl_url      = config["brightnesslvl_url"];
 		this.http_method            = config["http_method"] 	  	 	|| "GET";;
-		this.http_brightness_method = config["http_brightness_method"]  || this.http_method;
-		this.username               = config["username"] 	  	 	 	|| "";
-		this.password               = config["password"] 	  	 	 	|| "";
+		this.http_brightness_method = config["http_brightness_method"]  	|| this.http_method;
+		this.username               = config["username"] 	  	 	|| "";
+		this.password               = config["password"] 	  	 	|| "";
 		this.sendimmediately        = config["sendimmediately"] 	 	|| "";
-		this.service                = config["service"] 	  	 	 	|| "Switch";
+		this.service                = config["service"] 	  	 	|| "Switch";
 		this.name                   = config["name"];
 		this.brightnessHandling     = config["brightnessHandling"] 	 	|| "no";
-		this.switchHandling 		= config["switchHandling"] 		 	|| "no";
+		this.switchHandling 	    = config["switchHandling"] 		 	|| "no";
+
 		
 		//realtime polling info
 		this.state = false;
@@ -43,7 +44,11 @@ var pollingtoevent = require('polling-to-event');
 	        	that.httpRequest(powerurl, "", "GET", that.username, that.password, that.sendimmediately, function(error, response, body) {
             		if (error) {
                 		that.log('HTTP get power function failed: %s', error.message);
-		                done(error);
+				try {
+		                	done(new Error("Network failure that must not stop homebridge!"));
+				} catch(err) {
+					that.log(err.message);
+				}
             		} else {               				    
 						done(null, body);
             		}
