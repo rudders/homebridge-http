@@ -18,6 +18,12 @@ Supports https devices on the HomeBridge Platform and provides a readable callba
 
 This module has recently been updated to support an additional method to read the power state of the device and the brightness level. Specify the `status_url` in your config.json that returns the status of the device as an integer (0 = off, 1 = on). 
 
+In the latest version you can use custom status responses beyond 0 and 1
+
+For example include these in config.json, these work with motion, exchange for what you get from your status url.
+"status_on": "ACTIVE",
+"status_off": "PAUSE",
+
 Specify the `brightnesslvl_url` to return the current brightness level as an integer.
 
 Switch Handling and brightness Handling support 3 methods, yes for polling on app load, realtime for constant polling or no polling
@@ -34,6 +40,8 @@ Configuration sample:
 		"on_url":      "http://localhost/controller/1700/ON",
 		"off_url":     "http://localhost/controller/1700/OFF",
 		"status_url":  "http://localhost/status/100059",
+		"status_on": "ON",
+		"status_off": "OFF",
 		"service": "Light",
 		"brightnessHandling": "yes",
 		"brightness_url":     "http://localhost/controller/1707/%b",
