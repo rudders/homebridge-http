@@ -24,13 +24,16 @@ For example include these in config.json, these work with motion, exchange for w
 "status_on": "ACTIVE",
 "status_off": "PAUSE",
 
-On and off statuses also support JSON responses. If you need a more complex what to tell if your accessory is in an on state have it send a JSON object back that matches what you specify in the config file.
+On and off statuses also support JSON responses. If you need a more complex way to tell if your accessory is in an on state have it send a JSON object back that matches what you specify in the config file.
 Example:
+```
 "status_on": {
     "speaker": "ON",
     "playlist": "Top Hits",
     "playmode": "PLAY"
 }
+```
+Note that the response can contain more properties than what is specified, if all of the properties in the config object have matching properties in the response than it will be considered a match.
 
 Specify the `brightnesslvl_url` to return the current brightness level as an integer.
 
