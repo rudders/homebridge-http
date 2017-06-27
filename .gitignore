@@ -2,10 +2,10 @@
 *.log
 
 .settings/*
-.gitignore
 .project
 .npmignore
 .jshintrc
 
 *.orig
 node_modules/*
+.idea/
