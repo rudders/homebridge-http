@@ -61,7 +61,10 @@ function HttpAccessory(log, config) {
         function compareStates(customStatus, stateData) {
             var objectsEqual = true;
             for (var param in customStatus) {
-                if (stateData[param] !== customStatus[param]) objectsEqual = false;
+                if (!stateData.hasOwnProperty(param) || customStatus[param] !== stateData[param]) {
+                    objectsEqual = false;
+                    break;
+                }
             }
             // that.log("Equal", objectsEqual);
             return objectsEqual;
