@@ -73,6 +73,8 @@ function HttpAccessory(log, config) {
                 var customStatusOn = that.status_on;
                 var customStatusOff = that.status_off;
                 var statusOn, statusOff;
+
+                // Check to see if custom states are a json object and if so compare to see if either one matches the state response
                 if (responseBody.startsWith("{")) {
                     statusOn = compareStates(customStatusOn, JSON.parse(responseBody));
                     statusOff = compareStates(customStatusOff, JSON.parse(responseBody));
@@ -216,6 +218,8 @@ HttpAccessory.prototype = {
                     var customStatusOn = that.status_on;
                     var customStatusOff = that.status_off;
                     var statusOn, statusOff;
+
+                    // Check to see if custom states are a json object and if so compare to see if either one matches the state response
                     if (responseBody.startsWith("{")) {
                         statusOn = compareStates(customStatusOn, JSON.parse(responseBody));
                         statusOff = compareStates(customStatusOff, JSON.parse(responseBody));
