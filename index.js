@@ -218,8 +218,8 @@ HttpAccessory.prototype = {
                 var binaryState;
                 this.log("Status Config On", this.status_on);
                 if (this.status_on && this.status_off) {	//Check if custom status checks are set
-                    var customStatusOn = that.status_on;
-                    var customStatusOff = that.status_off;
+                    var customStatusOn = this.status_on;
+                    var customStatusOff = this.status_off;
                     var statusOn, statusOff;
 
                     // Check to see if custom states are a json object and if so compare to see if either one matches the state response
@@ -230,7 +230,7 @@ HttpAccessory.prototype = {
                         statusOn = responseBody.includes(customStatusOn);
                         statusOff = responseBody.includes(customStatusOff);
                     }
-                    that.log("Status On Get Power State", statusOn);
+                    this.log("Status On Get Power State", statusOn);
                     if (statusOn) binaryState = 1;
                     // else binaryState = 0;
                     if (statusOff) binaryState = 0;
