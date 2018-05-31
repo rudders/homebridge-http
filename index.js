@@ -32,6 +32,7 @@ function HttpAccessory(log, config) {
     this.name = config["name"];
     this.brightnessHandling = config["brightnessHandling"] || "no";
     this.switchHandling = config["switchHandling"] || "no";
+    this.statusPollingInterval = config["statusPollingInterval"] || 300;
 
 
     //realtime polling info
@@ -56,19 +57,7 @@ function HttpAccessory(log, config) {
                     done(null, body);
                 }
             })
-        }, { longpolling: true, interval: 300, longpollEventName: "statuspoll" });
-
-        function compareStates(customStatus, stateData) {
-            var objectsEqual = true;
-            for (var param in customStatus) {
-                if (!stateData.hasOwnProperty(param) || customStatus[param] !== stateData[param]) {
-                    objectsEqual = false;
-                    break;
-                }
-            }
-            // that.log("Equal", objectsEqual);
-            return objectsEqual;
-        }
+        }, { longpolling: true, interval: this.statusPollingInterval, longpollEventName: "statuspoll" });
 
         statusemitter.on("statuspoll", function (responseBody) {
             var binaryState;
@@ -79,8 +68,8 @@ function HttpAccessory(log, config) {
 
                 // Check to see if custom states are a json object and if so compare to see if either one matches the state response
                 if (responseBody.startsWith("{")) {
-                    statusOn = compareStates(customStatusOn, JSON.parse(responseBody));
-                    statusOff = compareStates(customStatusOff, JSON.parse(responseBody));
+                    statusOn = this.compareStates(customStatusOn, JSON.parse(responseBody));
+                    statusOff = this.compareStates(customStatusOff, JSON.parse(responseBody));
                 } else {
                     statusOn = responseBody.includes(customStatusOn);
                     statusOff = responseBody.includes(customStatusOff);
@@ -224,8 +213,8 @@ HttpAccessory.prototype = {
 
                     // Check to see if custom states are a json object and if so compare to see if either one matches the state response
                     if (responseBody.startsWith("{")) {
-                        statusOn = compareStates(customStatusOn, JSON.parse(responseBody));
-                        statusOff = compareStates(customStatusOff, JSON.parse(responseBody));
+                        statusOn = this.compareStates(customStatusOn, JSON.parse(responseBody));
+                        statusOff = this.compareStates(customStatusOff, JSON.parse(responseBody));
                     } else {
                         statusOn = responseBody.includes(customStatusOn);
                         statusOff = responseBody.includes(customStatusOff);
@@ -378,5 +367,17 @@ HttpAccessory.prototype = {
                 return [informationService, this.lightbulbService];
                 break;
         }
+    },
+    compareStates: function (customStatus, stateData) {
+        var objectsEqual = true;
+        for (var param in customStatus) {
+            if (!stateData.hasOwnProperty(param) || customStatus[param] !== stateData[param]) {
+                objectsEqual = false;
+                break;
+            }
+        }
+        // that.log("Equal", objectsEqual);
+        return objectsEqual;
     }
+
 };
